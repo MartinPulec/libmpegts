@@ -120,17 +120,25 @@ static void write_service_descriptor( bs_t *s, int service_type, char *provider_
 {
     int provider_name_length = strlen( provider_name );
     int service_name_length = strlen( service_name );
+    int descriptor_length = provider_name_length + service_name_length + 3;
+    if( descriptor_length > 255 ) { // truncate
+      int excess = descriptor_length - 255;
+      int cut_svc = MIN( excess, service_name_length );
+      service_name_length -= cut_svc;
+      provider_name_length -= excess - cut_svc;
+      descriptor_length = provider_name_length + service_name_length + 3;
+    }
 
     bs_write( s, 8, DVB_SERVICE_DESCRIPTOR_TAG ); // descriptor_tag
-    bs_write( s, 8, provider_name_length + service_name_length + 3 ); // descriptor_length
+    bs_write(s, 8, descriptor_length);            // descriptor_length
     bs_write( s, 8, service_type );               // service_type
 
     bs_write( s, 8, provider_name_length ); // service_provider_name_length
-    while( *provider_name != '\0' )
+    for( int i = 0; i < provider_name_length; i++ )
         bs_write( s, 8, (unsigned char)*provider_name++ );
 
     bs_write( s, 8, service_name_length ); // service_name_length
-    while( *service_name != '\0' )
+    for( int i = 0; i < service_name_length; i++ )
        bs_write( s, 8, (unsigned char)*service_name++ );
 }
 
