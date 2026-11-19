@@ -228,6 +228,7 @@ static void add_to_buffer( buffer_t *buffer )
 
 static void drip_buffer( ts_writer_t *w, ts_int_program_t *program, int rx, buffer_t *buffer, double next_pcr )
 {
+    (void) program;
     int iters;
     double offset;
 
@@ -664,7 +665,7 @@ static void retransmit_psi_and_si( ts_writer_t *w, ts_int_program_t *program )
 {
     // TODO make this work with multiple programs
     int64_t cur_pcr = get_pcr_int( w, 0 );
-    if( cur_pcr - w->last_pat >= w->pat_period * 27000LL || !w->last_pat )
+    if( cur_pcr - w->last_pat >= w->pat_period * 27000ULL || !w->last_pat )
     {
         /* Although it is not in line with the mux strategy it is good practice to write PAT and PMT together */
         w->last_pat = cur_pcr;
@@ -674,7 +675,7 @@ static void retransmit_psi_and_si( ts_writer_t *w, ts_int_program_t *program )
 
     cur_pcr = get_pcr_int( w, 0 );
 
-    if( w->sdt && ( cur_pcr - w->last_sdt >= w->sdt_period * 27000LL || !w->last_sdt ) )
+    if( w->sdt && ( cur_pcr - w->last_sdt >= w->sdt_period * 27000ULL || !w->last_sdt ) )
     {
         w->last_sdt = cur_pcr;
         write_sdt( w );
@@ -682,6 +683,7 @@ static void retransmit_psi_and_si( ts_writer_t *w, ts_int_program_t *program )
 }
 
 /* DVB / Blu-Ray Service Information */
+[[maybe_unused]]
 static int write_sit( ts_writer_t *w )
 {
     int start;
@@ -746,6 +748,7 @@ static void write_timestamp( bs_t *s, uint64_t timestamp )
 
 static int write_pes( ts_writer_t *w, ts_int_program_t *program, ts_frame_t *in_frame, ts_int_pes_t *out_pes )
 {
+    (void) w, (void) program;
     bs_t s, q;
     uint8_t temp[1024];
     int header_size, total_size;
@@ -1168,6 +1171,7 @@ void ts_update_transport_stream( ts_writer_t *w, ts_main_t *params )
 
 int ts_setup_mpegvideo_stream( ts_writer_t *w, int pid, int level, int profile, int vbv_maxrate, int vbv_bufsize, int frame_rate )
 {
+    (void) frame_rate;
     int bs_mux, bs_oh;
     int level_idx = -1;
 
@@ -1567,7 +1571,7 @@ int ts_write_frames( ts_writer_t *w, ts_frame_t *frames, int num_frames, uint8_t
     ts_int_pes_t **queued_pes;
     ts_int_pes_t **new_pes;
 
-    int stuffing, flags, pkt_bytes_left, write_pcr, write_adapt_field, adapt_field_len, pes_start, running;
+    int stuffing, flags, pkt_bytes_left, write_pcr, write_adapt_field, adapt_field_len, pes_start;
     uint8_t temp[200];
     bs_t q;
     bs_t *s = &w->out.bs;
@@ -1729,7 +1733,6 @@ int ts_write_frames( ts_writer_t *w, ts_frame_t *frames, int num_frames, uint8_t
     }
 
     write_pcr = 0;
-    running = 1;
 
     if( !w->first_input )
     {
@@ -1997,6 +2000,7 @@ int ts_write_frames( ts_writer_t *w, ts_frame_t *frames, int num_frames, uint8_t
 
 int ts_delete_stream( ts_writer_t *w, int pid )
 {
+    (void) w, (void) pid;
     // TODO
 
     return 0;

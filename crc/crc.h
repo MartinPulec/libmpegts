@@ -21,6 +21,8 @@
 #ifndef LIBMPEGTS_CRC_H
 #define LIBMPEGTS_CRC_H
 
+#include <stdint.h>
+
 uint32_t crc_32( uint8_t *bytes, int length );
 
 #endif

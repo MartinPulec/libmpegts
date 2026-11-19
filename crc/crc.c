@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include "crc.h"
+
 #include "../common.h"
 
 static const uint32_t crc_table[256] =
